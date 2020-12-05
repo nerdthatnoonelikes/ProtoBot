@@ -22,7 +22,7 @@ import * as fs from 'fs';
 import strip from 'strip-ansi';
 
 // Create logging streams
-const logInitTime: number = Date.now();
+const logInitTime = Date.now();
 try {
     fs.readdirSync('../logs/');
 } catch (e) {
@@ -67,7 +67,7 @@ try {
 }
 
 // Log to file func
-function writeItem(mode: 'i' | 'w' | 'e', message: string): void {
+function writeItem(mode: 'i' | 'w' | 'e', message: string) {
     if (mode === 'e') {
         errStr?.write(`${strip(message)}\n`);
         warnStr?.write(`${strip(message)}\n`);
@@ -85,7 +85,7 @@ export default function log(mode: 'CLOSE_STREAMS'): Promise<void>;
 export default function log(mode: 'i' | 'w' | 'e', message: string): void;
 export default function log(mode: 'i' | 'w' | 'e' | 'CLOSE_STREAMS', message?: string): void | Promise<void> {
     if (mode === 'CLOSE_STREAMS') {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             errStr?.end(() => {
                 warnStr?.end(() => {
                     allStr?.end(() => {
@@ -112,7 +112,7 @@ export default function log(mode: 'i' | 'w' | 'e' | 'CLOSE_STREAMS', message?: s
         const parsedDate = `${chalk.green(preparsedDate[0])} ${chalk.yellow(preparsedDate[1][0])} ${chalk.yellow.bold(
             preparsedDate[1][1]
         )} ${chalk.green.bold(preparsedDate[2])}`;
-        const sep: string = chalk.yellow(':');
+        const sep = chalk.yellow(':');
         const parsedTime = `${chalk.yellow.bold(preparsedTime[0][0])}${sep}${chalk.yellow.bold(preparsedTime[0][1])}${sep}${chalk.yellow.bold(
             preparsedTime[0][2]
         )} ${chalk.red(preparsedTime[1])}`;
@@ -132,12 +132,11 @@ export default function log(mode: 'i' | 'w' | 'e' | 'CLOSE_STREAMS', message?: s
                 break;
         }
 
-        const brackets: string[] = [chalk.yellow('['), chalk.yellow(']')];
+        const brackets = [chalk.yellow('['), chalk.yellow(']')];
 
         msg = `${brackets[0]}${parsedDate} ${parsedTime}${brackets[1]} ${msg}`;
 
         console.log(msg);
-        // @ts-ignore
         writeItem(mode, msg);
 
         return undefined;
