@@ -29,7 +29,7 @@ export function run(client: Client, message: Message, log: (mode: 'i' | 'w' | 'e
     // Check cooldown
     if (!cooldowns || cooldowns + client.config.cooldowns.tildes - Date.now() < 1) {
         let hasPrefix = false;
-        client.config.prefixes.forEach((prefix: string) => {
+        client.config.prefixes.forEach((prefix) => {
             if (!hasPrefix && message.content.startsWith(prefix)) {
                 hasPrefix = true;
             }
