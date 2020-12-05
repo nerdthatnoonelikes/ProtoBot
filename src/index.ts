@@ -33,6 +33,7 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import Client from '@lib/Client';
 import type Command from '@lib/interfaces/Command';
+import Module from '@lib/interfaces/Module';
 
 // Log import
 import log from './log';
@@ -43,9 +44,9 @@ const client = new Client();
 // Ready event
 client.on('ready', async () => {
     console.clear();
-    const userCountsPerGuild: number[] = client.guilds.cache.map((g: discord.Guild) => g.memberCount - 1);
+    const userCountsPerGuild = client.guilds.cache.map((g: discord.Guild) => g.memberCount - 1);
     let userTotal = 0;
-    userCountsPerGuild.forEach((item: number) => (userTotal += item));
+    userCountsPerGuild.forEach((item) => (userTotal += item));
     const userAvg = userTotal / userCountsPerGuild.length;
     log('i', 'Ready!');
     log(
@@ -69,13 +70,13 @@ client.on('ready', async () => {
             log(type, `${chalk.yellow('[')}${chalk.yellow.bold('CMDLOAD')}${chalk.yellow(']')} ${message}`);
         }
         l('i', 'Beginning initial command load...');
-        fs.readdir(client.config.dirs.commands, (err: NodeJS.ErrnoException | null, files: string[]) => {
+        fs.readdir(client.config.dirs.commands, (err, files) => {
             if (err) {
                 l('e', `Failed to read directory ${client.config.dirs.commands}:`);
                 // @ts-ignore
                 l('e', err);
             } else {
-                files.forEach((path: string) => {
+                files.forEach((path) => {
                     if (path.endsWith('.js')) {
                         if (path.replace('.js', '').toLowerCase() !== path.replace('.js', '')) {
                             l('w', `CommandCasedWarning: Command at ${path} has a name with a capital letter!`);
@@ -83,10 +84,12 @@ client.on('ready', async () => {
                             path = path.toLowerCase();
                         }
                         // normal load
-                        const commandData = require(client.config.dirs.commands.endsWith('/')
-                            ? client.config.dirs.commands + path
-                            : `${client.config.dirs.commands}/${path}`);
-                        const cmdName: string = path.replace('.js', '');
+                        const commandData = <Command>(
+                            require(client.config.dirs.commands.endsWith('/')
+                                ? client.config.dirs.commands + path
+                                : `${client.config.dirs.commands}/${path}`)
+                        );
+                        const cmdName = path.replace('.js', '');
                         l('i', `Loading command "${cmdName}"...`);
                         client.commandsConfig.set(cmdName, commandData.config);
                         client.commands.set(cmdName, commandData);
@@ -94,7 +97,7 @@ client.on('ready', async () => {
                         l('i', `Loading command aliases for ${cmdName}...`);
                         l('i', 'Loaded base alias!');
                         client.commandsRefs.set(cmdName, cmdName); // base
-                        (commandData.config.aliases ?? []).forEach((alias: string) => {
+                        (commandData.config.aliases ?? []).forEach((alias) => {
                             l('i', `Loaded alias ${alias}!`);
                             client.commandsRefs.set(alias, cmdName);
                         });
@@ -110,24 +113,26 @@ client.on('ready', async () => {
         });
     }
     loadCmds();
-    function loadMods(): void {
+    function loadMods() {
         function l(type: 'i' | 'w' | 'e', message: string) {
             log(type, `${chalk.yellow('[')}${chalk.yellow.bold('MODLOAD')}${chalk.yellow(']')} ${message}`);
         }
         l('i', 'Beginning initial module load...');
-        fs.readdir(client.config.dirs.modules, (err: NodeJS.ErrnoException | null, files: string[]) => {
+        fs.readdir(client.config.dirs.modules, (err, files) => {
             if (err) {
                 l('e', `Failed to read directory ${client.config.dirs.modules}:`);
                 // @ts-ignore
                 l('e', err);
             } else {
-                files.forEach((path: string) => {
+                files.forEach((path) => {
                     if (path.endsWith('.js')) {
                         // normal load
-                        const moduleData = require(client.config.dirs.modules.endsWith('/')
-                            ? client.config.dirs.modules + path
-                            : `${client.config.dirs.modules}/${path}`);
-                        const modName: string = path.replace('.js', '');
+                        const moduleData = <Module>(
+                            require(client.config.dirs.modules.endsWith('/')
+                                ? client.config.dirs.modules + path
+                                : `${client.config.dirs.modules}/${path}`)
+                        );
+                        const modName = path.replace('.js', '');
                         l('i', `Loading module "${modName}"...`);
                         client.modules.set(modName, moduleData);
                         l('i', `Finished loading module "${modName}"!`);
@@ -148,7 +153,7 @@ client.on('ready', async () => {
 });
 
 // Message handler
-client.on('message', (message: discord.Message) => {
+client.on('message', (message) => {
     client.ustats.ensure(message.author.id, client.defaults.USER_STATS);
     client.uconfs.ensure(message.author.id, client.defaults.USER_CONFS);
     client.cooldowns.ensure(message.author.id, client.defaults.COOLDOWNS);
@@ -170,7 +175,7 @@ client.on('message', (message: discord.Message) => {
         }
     });
     if (msgIsCommand) {
-        const args: string[] = message.content.slice(prefixLen).split(/ +/g);
+        const args = message.content.slice(prefixLen).split(/ +/g);
         let command = args.shift()?.toLowerCase() ?? '';
         if (!command) {
             // exit
@@ -189,7 +194,7 @@ client.on('message', (message: discord.Message) => {
         command = client.commandsRefs.get(command) ?? '';
         log('i', `Alias resolved to "${command}"!`);
 
-        const commandData: Command | undefined = client.commands.get(command);
+        const commandData = client.commands.get(command);
         if (!commandData) {
             // exit
             log('i', `Failed to find command "${command}", exiting handler.`);
@@ -220,7 +225,7 @@ client.on('message', (message: discord.Message) => {
 });
 
 // Handle rate limits
-client.on('rateLimit', (data: discord.RateLimitData) => {
+client.on('rateLimit', (data) => {
     log('w', 'Got hit with a ratelimit!');
     log('w', `Ratelimited when performing ${data.method} ${data.path}`);
     log('w', `API route was ${data.route} and limit hit was ${data.limit}/${data.timeout}ms (${data.timeout / 1000} seconds).`);
@@ -234,7 +239,7 @@ process.on('exit', (code) => {
 });
 
 // If we get an uncaught exception, close ASAP.
-process.on('uncaughtException', async (error: Error) => {
+process.on('uncaughtException', async (error) => {
     client.destroy();
     log('e', 'An uncaught exception occured!');
     log('e', `Error thrown was:`);
