@@ -56,6 +56,15 @@ export function run(client: Client, message: Message, args: string[], log: (mode
         msg += ` 8 :: ${u8?.tag ?? '(none)'}${t10[7] ? ` with ${t10[7][0]} tildes` : ''}\n`;
         msg += ` 9 :: ${u9?.tag ?? '(none)'}${t10[8] ? ` with ${t10[8][0]} tildes` : ''}\n`;
         msg += `10 :: ${u10?.tag ?? '(none)'}${t10[9] ? ` with ${t10[9][0]} tildes` : ''}\n`;
+        if (!uintop) {
+            const u = tops.find((val) => val[1] === message.author.id);
+            if (u) {
+                msg += `===========================`;
+                const pos = tops.indexOf(u) + 1;
+                const usr: discord.User = await client.users.fetch(u[1]);
+                msg += `${pos < 10 ? ` ${pos}` : pos} :: ${usr.tag} with ${tops[pos - 1][0]} tildes`;
+            }
+        }
         msg += '```';
         message.reply(msg);
     })();
