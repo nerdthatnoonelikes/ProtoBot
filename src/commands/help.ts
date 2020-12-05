@@ -19,6 +19,7 @@
 // Modules
 import discord from 'discord.js';
 import type { Client, Message } from 'discord.js';
+import type CommandConfig from '@lib/interfaces/CommandConfig'
 
 // Main
 export function run(client: Client, message: Message, args: string[], log: (mode: 'i' | 'w' | 'e', message: string) => void): void {
@@ -30,7 +31,7 @@ export function run(client: Client, message: Message, args: string[], log: (mode
         .setFooter(`Requested by ${message.author.tag}`)
         .setDescription('Here are all of my commands!');
 
-    client.commandsConfig.forEach((command: { name: string; description: string; enabled: boolean; restrict: boolean | { users: string[] } }) => {
+    client.commandsConfig.forEach((command: CommandConfig) => {
         embed.addField(
             command.name,
             `${command.description}${command.enabled ? '' : ' **[Disabled]**'}${command.restrict ? ' **[Restricted]**' : ''}`,

@@ -29,7 +29,7 @@ export function run(client: Client, message: Message, args: string[], log: (mode
         args.shift();
         silent = true;
     }
-    const code: string = args.join(' ');
+    const code = args.join(' ');
     if (message.author.id !== client.config.ownerID) {
         log(
             'w',
@@ -43,7 +43,7 @@ ${code}`
     const embed = new discord.MessageEmbed().setFooter(`Exec command executed by ${message.author.username}`).setTimestamp();
     let e = false;
 
-    exec(code, (error: ExecException | null, stdout: string, stderr: string) => {
+    exec(code, (error, stdout, stderr) => {
         if (error || stderr) {
             e = true;
         }
@@ -83,13 +83,13 @@ ${code}`
             }
             if (stderr) {
                 log(e ? 'e' : 'i', 'STDERR:');
-                stderr.split('\n').forEach((b: string) => {
+                stderr.split('\n').forEach((b) => {
                     log(e ? 'e' : 'i', b);
                 });
             }
             if (stdout) {
                 log(e ? 'e' : 'i', 'STDOUT:');
-                stdout.split('\n').forEach((b: string) => {
+                stdout.split('\n').forEach((b) => {
                     log(e ? 'e' : 'i', b);
                 });
             }
@@ -110,13 +110,13 @@ ${code}`
             }
             if (stderr) {
                 log(e ? 'e' : 'i', 'STDERR:');
-                stderr.split('\n').forEach((b: string) => {
+                stderr.split('\n').forEach((b) => {
                     log(e ? 'e' : 'i', b);
                 });
             }
             if (stdout) {
                 log(e ? 'e' : 'i', 'STDOUT:');
-                stdout.split('\n').forEach((b: string) => {
+                stdout.split('\n').forEach((b) => {
                     log(e ? 'e' : 'i', b);
                 });
             }

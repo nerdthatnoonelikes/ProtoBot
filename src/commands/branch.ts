@@ -19,7 +19,7 @@
 // Modules
 import discord from 'discord.js';
 import type { Client, Message } from 'discord.js';
-import { exec, ExecException } from 'child_process';
+import { exec } from 'child_process';
 
 // Main
 export function run(client: Client, message: Message, args: string[], log: (mode: 'i' | 'w' | 'e', message: string) => void): void {
@@ -34,13 +34,13 @@ export function run(client: Client, message: Message, args: string[], log: (mode
         message.reply('What branch did you want to switch to, tho?');
     }
 
-    let embed: discord.MessageEmbed = new discord.MessageEmbed()
+    let embed = new discord.MessageEmbed()
         .setTitle('Branch Switch')
         .setDescription(`Please wait.. Switching to \`${args[0]}\`...`)
         .addField('Status', `\`$ git branch ${args[0]}\``);
 
-    message.channel.send(embed).then((m: discord.Message) => {
-        exec(`git checkout ${args[0]}`, (error: ExecException | null, stdout: string, stderr: string) => {
+    message.channel.send(embed).then((m) => {
+        exec(`git checkout ${args[0]}`, (error, stdout, stderr) => {
             embed = new discord.MessageEmbed()
                 .setTitle(`Branch Switch [${stderr.startsWith('Switched') ? 'Complete' : 'Failed'}]`)
                 .setDescription(stderr.startsWith('Switched') ? `Switched to branch ${args[0]}` : 'Failed to switch to branch. (Does it exist?)');

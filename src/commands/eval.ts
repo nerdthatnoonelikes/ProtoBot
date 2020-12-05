@@ -31,7 +31,7 @@ export async function run(client: Client, message: Message, args: string[], log:
         args.shift();
         silent = true;
     }
-    let code: string = args.join(' ');
+    let code = args.join(' ');
     if (message.author.id !== client.config.ownerID) {
         log(
             'w',

@@ -63,9 +63,9 @@ export function run(client: Client, message: Message, args: string[], log: (mode
         .setFooter('Thank you, all.')
         .setDescription('Come on, read this! They worked hard for it!');
 
-    credits.forEach((item: CreditItem) => {
+    credits.forEach((item) => {
         let str = '';
-        item.users.forEach((user: CreditedUser, index: number) => {
+        item.users.forEach((user, index) => {
             if (str.length === 0) {
                 str += `Thank you, ${user.tag}`;
             } else {
